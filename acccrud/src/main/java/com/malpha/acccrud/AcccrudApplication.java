@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AcccrudApplication {
+public class AccCrudApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AcccrudApplication.class, args);
+		SpringApplication.run(AccCrudApplication.class, args);
 	}
 
 }
