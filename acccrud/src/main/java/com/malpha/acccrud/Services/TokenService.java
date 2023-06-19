@@ -1,5 +1,6 @@
 package com.malpha.acccrud.Services;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -18,6 +19,7 @@ public class TokenService {
 
     private final JwtEncoder encoder;
 
+    
     public TokenService(JwtEncoder encoder) {
         this.encoder = encoder;
     }
