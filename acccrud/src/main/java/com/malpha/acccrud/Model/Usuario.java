@@ -9,9 +9,10 @@ import jakarta.persistence.Id;
 @Entity
 public class Usuario {
 
-    public Usuario(long id, String username, String email, String password) {
+    public Usuario(long id, String username, String name, String email, String password) {
         this.id = id;
         this.username = username;
+        this.name = name;
         this.email = email;
         this.password = password;
     }
@@ -22,7 +23,10 @@ public class Usuario {
 
     @Column(nullable = false)
     private String username;
-    
+
+    @Column(nullable = false)
+    private String name;
+
     @Column(nullable = false)
     private String email;
     
@@ -43,6 +47,14 @@ public class Usuario {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {
