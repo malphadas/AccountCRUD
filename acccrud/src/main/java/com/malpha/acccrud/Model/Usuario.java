@@ -9,13 +9,13 @@ import jakarta.persistence.Id;
 @Entity
 public class Usuario {
 
-    public Usuario(long id, String username, String name, String email, String password) {
+    /*public Usuario(long id, String username, String name, String email, String password) {
         this.id = id;
         this.username = username;
         this.name = name;
         this.email = email;
         this.password = password;
-    }
+    }*/
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

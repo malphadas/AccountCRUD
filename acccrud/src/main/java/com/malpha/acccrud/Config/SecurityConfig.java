@@ -28,8 +28,8 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests( auth -> auth
-                        .requestMatchers("/").permitAll()
-                        .anyRequest().authenticated()
+                        //.requestMatchers("/").permitAll()
+                        .anyRequest().permitAll()//authenticated()
                 )
                 .httpBasic(withDefaults())
                 .build();
