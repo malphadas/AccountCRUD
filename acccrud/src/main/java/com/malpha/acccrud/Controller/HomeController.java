@@ -9,12 +9,22 @@ public class HomeController {
     
     @GetMapping("/")
     public String home(){
-        return "home.html";
+        return "Home.html";
     }
 
-    @GetMapping("/locked")
-    public String locked(){
-        return "locked";
+    @GetMapping("/user/register")
+    public String register(){
+        return "Register.html";
+    }
+
+    @GetMapping("/user/login")
+    public String login(){
+        return "Login.html";
     }
     
+    @GetMapping("/admin")
+    public String admin(){
+        return "Users.html";
+    }
+
 }

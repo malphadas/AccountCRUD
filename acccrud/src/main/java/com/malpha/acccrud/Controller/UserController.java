@@ -25,7 +25,7 @@ import com.malpha.acccrud.Repo.UserRepository;
  */
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
 
 	@Autowired
@@ -36,7 +36,7 @@ public class UserController {
 		return UserRepo.findAll();		
 	}
 	
-	@PostMapping
+	@PostMapping("/register")
 	public Usuario addUser(@RequestBody Usuario myUser) {
 		return UserRepo.save(myUser);
 	}
