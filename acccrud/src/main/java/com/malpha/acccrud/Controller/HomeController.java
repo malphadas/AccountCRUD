@@ -12,19 +12,24 @@ public class HomeController {
         return "Home.html";
     }
 
-    @GetMapping("/user/register")
+    @GetMapping("/register")
     public String register(){
         return "Register.html";
     }
 
-    @GetMapping("/user/login")
+    @GetMapping("/login")
     public String login(){
         return "Login.html";
     }
     
     @GetMapping("/admin")
     public String admin(){
-        return "Users.html";
+        return "UserList.html";
+    }
+
+    @GetMapping("/{id}")
+    public static String userPage(){
+        return "UserPage.html";
     }
 
 }

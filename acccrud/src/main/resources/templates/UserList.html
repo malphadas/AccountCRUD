@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+
+    #user-table-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    .button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>User List</h1>
+  <table id="user-table">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Password</th>
+      <a href="/register" class="button">Register</a>
+    </tr>
+  </table>
+
+  <script>
+    // JavaScript code to fetch and display user data
+    // Make an AJAX request to fetch user data from the server
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/user/admin', true);
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        var users = JSON.parse(xhr.responseText);
+        displayUsers(users);
+      }
+    };
+    xhr.send();
+
+    // Function to display users in the HTML table
+    function displayUsers(users) {
+      var userTable = document.getElementById('user-table');
+      for (var i = 0; i < users.length; i++) {
+        var user = users[i];
+
+        // Create a new row
+        var row = document.createElement('tr');
+
+        // Create columns and populate with user information
+        var idCell = document.createElement('td');
+        idCell.textContent = user.id;
+
+        var nameCell = document.createElement('td');
+        nameCell.textContent = user.name;
+
+        var usernameCell = document.createElement('td');
+        usernameCell.textContent = user.username;
+
+        var emailCell = document.createElement('td');
+        emailCell.textContent = user.email;
+
+        var passwordCell = document.createElement('td');
+        passwordCell.textContent = user.password;
+
+        // Apply different colors based on user properties
+        if (user.role === 'admin') {
+          row.classList.add('admin');
+        } else if (user.role === 'moderator') {
+          row.classList.add('moderator');
+        }
+
+        // Append the cells to the row
+        row.appendChild(idCell);
+        row.appendChild(nameCell);
+        row.appendChild(usernameCell);
+        row.appendChild(emailCell);
+        row.appendChild(passwordCell);
+
+        // Append the row to the table
+        userTable.appendChild(row);
+      }
+    }
+  </script>
+</body>
+</html>
