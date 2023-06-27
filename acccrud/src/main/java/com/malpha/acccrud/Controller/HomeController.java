@@ -32,4 +32,9 @@ public class HomeController {
         return "UserPage.html";
     }
 
+    @GetMapping("/edit/{id}")
+    public static String EditPage(){
+        return "Edit.html";
+    }
+
 }

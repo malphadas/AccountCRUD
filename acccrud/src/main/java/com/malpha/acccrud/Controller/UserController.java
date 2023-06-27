@@ -72,27 +72,31 @@ public class UserController {
   }
 	
 	@PatchMapping("/{id}")
-	public ResponseEntity<Usuario> changeInfo(@PathVariable("id")Long userId,@RequestBody Usuario updatedUsuario) {
-		Optional<Usuario> optionalUser = UserRepo.findById(userId);
-	    if (optionalUser.isEmpty()) {
-	        return ResponseEntity.notFound().build();
-	    }
+	public ResponseEntity<Usuario> changeInfo(
+    @PathVariable("id") Long userId,
+    @RequestParam(value = "username", required = false) String username,
+    @RequestParam(value = "password", required = false) String password
+) {
+    Optional<Usuario> optionalUser = UserRepo.findById(userId);
+    if (optionalUser.isEmpty()) {
+        return ResponseEntity.notFound().build();
+    }
 
-	    Usuario existingUsuario = optionalUser.get();
+    Usuario existingUsuario = optionalUser.get();
 
-        if (updatedUsuario.getUsername() != null) {
-	        existingUsuario.setUsername(updatedUsuario.getUsername());
-	    }
-	    
-	    if (updatedUsuario.getPassword() != null) {
-	        existingUsuario.setPassword(updatedUsuario.getPassword());
-	    }
-	    
+    if (username != null) {
+        existingUsuario.setUsername(username);
+    }
 
-	    UserRepo.save(existingUsuario);
+    if (password != null) {
+        existingUsuario.setPassword(password);
+    }
 
-	    return ResponseEntity.ok(existingUsuario);	
-	}
+    UserRepo.save(existingUsuario);
+
+    // Return the updated user in the response
+    return ResponseEntity.ok(existingUsuario);
+}
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Usuario> deleteUser(@PathVariable("id") Long id){
 	    Optional<Usuario> optionalUser = UserRepo.findById(id);

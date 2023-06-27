@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Account</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 50vh;
+    }
+
+    .edit-form {
+      width: 300px;
+      border-radius: 4px;
+    }
+
+    .edit-form label {
+      font-weight: bold;
+    }
+
+    .edit-form input[type="text"],
+    .edit-form input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .edit-form button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+    <div class="container">
+      <h2>Edit User</h2>
+      <form id="edit-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+  
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+  
+        <button type="submit">Save Changes</button>
+      </form>
+    </div>
+
+    <script>
+        // JavaScript code to handle form submission
+        var editForm = document.getElementById('edit-form');
+    
+        editForm.addEventListener('submit', function (event) {
+          event.preventDefault();
+    
+          var userId = window.location.pathname.replace('/', '');
+          var username = document.getElementById('username').value;
+          var password = document.getElementById('password').value;
+    
+          // Create the PATCH request data
+          var data = {
+            username: username,
+            password: password
+          };
+    
+          // Make an AJAX request to update the user data
+          var xhr = new XMLHttpRequest();
+          xhr.open('PATCH', '/user/' + userId, true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.onload = function () {
+            if (xhr.status === 200) {
+              alert('User data updated successfully.');
+            } else {
+              alert('Error updating user data. Please try again.');
+            }
+          };
+          xhr.send(JSON.stringify(data));
+        });
+      </script>
+    </body>
+    </html>

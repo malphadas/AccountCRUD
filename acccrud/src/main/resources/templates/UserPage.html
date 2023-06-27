@@ -35,38 +35,57 @@
       border-radius: 4px;
       cursor: pointer;
     }
+    .container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 30vh;
+    }
   </style>
 <body>
-    <h1 id="welcome-header"></h1>
-    <p id="visit-count"></p>
-  
-    <script>
-      // JavaScript code to fetch and display user data
-      // Get the user ID from the URL path
-      var userId = window.location.pathname.replace('/', '');
-  
-      // Make an AJAX request to fetch user data from the server
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', '/user/' + userId, true);
-      xhr.onload = function () {
-        if (xhr.status === 200) {
-          var user = JSON.parse(xhr.responseText);
-          displayUser(user);
-        }
-      };
-      xhr.send();
-  
-      // Function to display user information in the HTML page
-      function displayUser(user) {
-        var welcomeHeader = document.getElementById('welcome-header');
-        var visitCountElement = document.getElementById('visit-count');
-  
-        // Display welcome message with the user's name
-        welcomeHeader.textContent = 'Welcome, ' + user.name + '!';
-  
-        // Display the number of times the user has visited the page
-        visitCountElement.textContent = 'You have visited ' + user.visitCount + ' times.';
+  <h1 id="welcome-header"></h1>
+  <p id="visit-count"></p>
+
+  <button id="edit-button" class="button">Edit Account</button>
+
+  <script>
+    // JavaScript code to fetch and display user data
+    // Get the user ID from the URL path
+    var userId = window.location.pathname.replace('/', '');
+
+    // Make an AJAX request to fetch user data from the server
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/user/' + userId, true);
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        var user = JSON.parse(xhr.responseText);
+        displayUser(user);
       }
-    </script>
-  </body>
-  </html>
+    };
+    xhr.send();
+
+    // Function to display user information in the HTML page
+    function displayUser(user) {
+      var welcomeHeader = document.getElementById('welcome-header');
+      var visitCountElement = document.getElementById('visit-count');
+
+      // Display welcome message with the user's name
+      welcomeHeader.textContent = 'Welcome, ' + user.name + '!';
+
+      // Display the number of times the user has visited the page
+      visitCountElement.textContent = 'You have visited ' + user.visitCount + ' times.';
+
+      // Add event listener to the edit button
+      var editButton = document.getElementById('edit-button');
+      editButton.addEventListener('click', function () {
+        redirectToEditPage(userId);
+      });
+    }
+
+    // Function to redirect to the edit page with the user ID
+    function redirectToEditPage(userId) {
+      window.location.href = '/edit/' + userId;
+    }
+  </script>
+</body>
+</html>
