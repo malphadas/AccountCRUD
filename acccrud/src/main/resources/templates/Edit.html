@@ -4,91 +4,94 @@
   <title>Edit Account</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+        font-family: Arial, sans-serif;
     }
 
     .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 50vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
     }
 
-    .edit-form {
-      width: 300px;
-      border-radius: 4px;
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
     }
 
-    .edit-form label {
-      font-weight: bold;
+    input {
+        width: 100%;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
     }
 
-    .edit-form input[type="text"],
-    .edit-form input[type="password"] {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+    input[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
     }
-
-    .edit-form button {
-      padding: 10px 20px;
-      margin-top: 10px;
-      font-size: 16px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-  </style>
+</style>
 </head>
 <body>
-    <div class="container">
-      <h2>Edit User</h2>
-      <form id="edit-form">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-  
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-  
-        <button type="submit">Save Changes</button>
-      </form>
-    </div>
+<div class = "container">
+  <h1>Edit User</h1>
+  <form id="editForm" method="patch" action="">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required><br><br>
 
-    <script>
-        // JavaScript code to handle form submission
-        var editForm = document.getElementById('edit-form');
-    
-        editForm.addEventListener('submit', function (event) {
-          event.preventDefault();
-    
-          var userId = window.location.pathname.replace('/', '');
-          var username = document.getElementById('username').value;
-          var password = document.getElementById('password').value;
-    
-          // Create the PATCH request data
-          var data = {
-            username: username,
-            password: password
-          };
-    
-          // Make an AJAX request to update the user data
-          var xhr = new XMLHttpRequest();
-          xhr.open('PATCH', '/user/' + userId, true);
-          xhr.setRequestHeader('Content-Type', 'application/json');
-          xhr.onload = function () {
-            if (xhr.status === 200) {
-              alert('User data updated successfully.');
-            } else {
-              alert('Error updating user data. Please try again.');
-            }
-          };
-          xhr.send(JSON.stringify(data));
-        });
-      </script>
-    </body>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required><br><br>
+
+      <input type="submit" value="Save">
+  </form>
+</div>
+  <script>
+      window.onload = function () {
+          // Get the userId from the URL
+          const userId = window.location.href.split("/").pop();
+
+          // Set the form action dynamically
+          const form = document.getElementById("editForm");
+          form.action = "/user/" + userId;
+
+          // Handle form submission
+          form.addEventListener("submit", function (event) {
+              event.preventDefault();
+
+              // Get the form data
+              const username = document.getElementById("username").value;
+              const password = document.getElementById("password").value;
+
+              // Create an object with the updated user data
+              const updatedUser = {
+                  username: username,
+                  password: password
+              };
+
+              // Send a PATCH request to update the user
+              fetch(form.action, {
+                  method: "PATCH",
+                  headers: {
+                      "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify(updatedUser)
+              })
+              .then(response => response.json())
+              .then(data => {
+                  // Handle the response
+                  if (data.error) {
+                      console.error("Error:", data.error);
+                  } else {
+                      console.log("User updated successfully:", data);
+                      // Redirect to a success page or perform any other action
+                  }
+              })
+              .catch(error => console.error("Error:", error));
+          });
+      };
+  </script>
+</body>
     </html>

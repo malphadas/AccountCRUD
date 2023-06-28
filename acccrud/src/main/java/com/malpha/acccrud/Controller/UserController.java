@@ -31,15 +31,15 @@ import com.malpha.acccrud.Repo.UserRepository;
 public class UserController {
 
 	@Autowired
-	private UserRepository UserRepo;
+	private UserRepository userRepo;
 
 	public UserController(UserRepository userRepo) {
-    this.UserRepo = userRepo;
+    this.userRepo = userRepo;
   }
 	
 	@GetMapping ("/admin")
 	public List<Usuario> list(){
-		return UserRepo.findAll();		
+		return userRepo.findAll();		
 	}
 	
 	@PostMapping("/register")
@@ -53,13 +53,13 @@ public class UserController {
     	newUser.setName(name);
     	newUser.setEmail(email);
     	newUser.setPassword(password);
-		return UserRepo.save(newUser);
+		return userRepo.save(newUser);
 	}
 
 	@GetMapping("/{id}")
   public Usuario getUserPage(@PathVariable("id") Long userId) {
     // Retrieve user from the repository based on ID
-    Optional<Usuario> optionalUser = UserRepo.findById(userId);
+    Optional<Usuario> optionalUser = userRepo.findById(userId);
 	if (optionalUser.isEmpty()) {
 	        return null;
 	    }
@@ -67,42 +67,34 @@ public class UserController {
     
     // Update the visit count
     existingUsuario.setVisitCount(existingUsuario.getVisitCount() + 1);
-	UserRepo.save(existingUsuario);
+	userRepo.save(existingUsuario);
 	return existingUsuario;
   }
 	
 	@PatchMapping("/{id}")
-	public ResponseEntity<Usuario> changeInfo(
-    @PathVariable("id") Long userId,
-    @RequestParam(value = "username", required = false) String username,
-    @RequestParam(value = "password", required = false) String password
-) {
-    Optional<Usuario> optionalUser = UserRepo.findById(userId);
-    if (optionalUser.isEmpty()) {
-        return ResponseEntity.notFound().build();
-    }
+	public ResponseEntity<Usuario> changeInfo(@PathVariable("id") Long userId,@RequestBody Usuario updatedUsuario) {
+		Optional<Usuario> optionalUser = userRepo.findById(userId);
+	    if (optionalUser.isEmpty()) {
+	        return ResponseEntity.notFound().build();
+	    }
 
-    Usuario existingUsuario = optionalUser.get();
+	    Usuario existingUsuario = optionalUser.get();
+	    
+	    existingUsuario.setUsername(updatedUsuario.getUsername());
+        existingUsuario.setPassword(updatedUsuario.getPassword());
 
-    if (username != null) {
-        existingUsuario.setUsername(username);
-    }
+	    userRepo.save(existingUsuario);
 
-    if (password != null) {
-        existingUsuario.setPassword(password);
-    }
+	    return ResponseEntity.ok(existingUsuario);	
+	}
 
-    UserRepo.save(existingUsuario);
-
-    // Return the updated user in the response
-    return ResponseEntity.ok(existingUsuario);
-}
+	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Usuario> deleteUser(@PathVariable("id") Long id){
-	    Optional<Usuario> optionalUser = UserRepo.findById(id);
+	    Optional<Usuario> optionalUser = userRepo.findById(id);
 	    
 		if (optionalUser.isPresent()) {
-	        UserRepo.delete(optionalUser.get());
+	        userRepo.delete(optionalUser.get());
 	        return ResponseEntity.ok().build(); // Successful delete, return 200 OK
 	    } else {
 	        return ResponseEntity.notFound().build(); // User with the specified ID not found, return 404 Not Found
