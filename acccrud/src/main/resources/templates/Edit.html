@@ -79,19 +79,17 @@
                   },
                   body: JSON.stringify(updatedUser)
               })
-              .then(response => response.json())
-              .then(data => {
-                  // Handle the response
-                  if (data.error) {
-                      console.error("Error:", data.error);
-                  } else {
-                      console.log("User updated successfully:", data);
-                      // Redirect to a success page or perform any other action
-                  }
-              })
-              .catch(error => console.error("Error:", error));
-          });
-      };
-  </script>
+              .then(response => {
+                    if (response.ok) {
+                        form.reset();
+                        alert("User updated successfully")
+                    } else {
+                        console.error("Error updating user");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        };
+    </script>
 </body>
-    </html>
+</html>

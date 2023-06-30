@@ -37,4 +37,9 @@ public class HomeController {
         return "Edit.html";
     }
 
+    @GetMapping("/delete/{id}")
+    public static String DeleteUser(){
+        return "Delete.html";
+    }
+
 }

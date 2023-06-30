@@ -64,5 +64,16 @@
       </div>
     </form>
   </div>
+  <script>
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+  
+    // Display the error message as a popup
+    if (error) {
+      alert(error);
+    }
+  </script>
+
 </body>
 </html>

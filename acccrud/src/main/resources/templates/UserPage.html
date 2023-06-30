@@ -46,7 +46,10 @@
   <h1 id="welcome-header"></h1>
   <p id="visit-count"></p>
 
-  <button id="edit-button" class="button">Edit Account</button>
+  <div class="button-container">
+    <button id="edit-button" class="button">Edit Account</button>
+    <button id="delete-button" class="button">Delete Account</button>
+  </div>
 
   <script>
     // JavaScript code to fetch and display user data
@@ -80,12 +83,22 @@
       editButton.addEventListener('click', function () {
         redirectToEditPage(userId);
       });
+
+      var deleteButton = document.getElementById('delete-button');
+      deleteButton.addEventListener('click', function () {
+        redirectToDeletePage(userId);
+    });
     }
 
     // Function to redirect to the edit page with the user ID
     function redirectToEditPage(userId) {
       window.location.href = '/edit/' + userId;
     }
+
+    function redirectToDeletePage(userId) {
+      window.location.href = '/delete/' + userId;
+    }
+    
   </script>
 </body>
 </html>

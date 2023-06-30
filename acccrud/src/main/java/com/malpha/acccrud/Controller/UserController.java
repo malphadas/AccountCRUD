@@ -1,5 +1,7 @@
 package com.malpha.acccrud.Controller;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.malpha.acccrud.Model.Usuario;
 import com.malpha.acccrud.Repo.UserRepository;
@@ -43,17 +46,41 @@ public class UserController {
 	}
 	
 	@PostMapping("/register")
-	public Usuario addUser(@RequestParam("username") String username,
+	public RedirectView addUser(@RequestParam("username") String username,
 						   @RequestParam("name") String name,
                        	   @RequestParam("email") String email,
                            @RequestParam("password") String password) {
+
+	boolean emailExists = userRepo.existsByEmail(email);
+
+  if (emailExists) {
+    // Email already registered, return a popup message
+    String errorMessage = "Email already registered";
+
+    // Pass the error message as a query parameter in the redirect URL
+    String redirectUrl = "http://localhost:8080/register?error=" + URLEncoder.encode(errorMessage, StandardCharsets.UTF_8);
+
+    // Create a RedirectView with the redirect URL
+    RedirectView redirectView = new RedirectView();
+    redirectView.setUrl(redirectUrl);
+
+    return redirectView;
+  }
 		
 		Usuario newUser = new Usuario();
     	newUser.setUsername(username);
     	newUser.setName(name);
     	newUser.setEmail(email);
     	newUser.setPassword(password);
-		return userRepo.save(newUser);
+		userRepo.save(newUser);
+		long userId = newUser.getId();
+
+    	String redirectUrl = "http://localhost:8080/" + userId;
+
+    	RedirectView redirectView = new RedirectView();
+    	redirectView.setUrl(redirectUrl);
+
+    	return redirectView;
 	}
 
 	@GetMapping("/{id}")
@@ -90,18 +117,20 @@ public class UserController {
 
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Usuario> deleteUser(@PathVariable("id") Long id){
-	    Optional<Usuario> optionalUser = userRepo.findById(id);
-	    
-		if (optionalUser.isPresent()) {
-	        userRepo.delete(optionalUser.get());
-	        return ResponseEntity.ok().build(); // Successful delete, return 200 OK
-	    } else {
-	        return ResponseEntity.notFound().build(); // User with the specified ID not found, return 404 Not Found
-	    }
-		
-	}
-	
-	
-	
+public ResponseEntity<Usuario> deleteUser(@PathVariable("id") Long id, @RequestParam("password") String password) {
+    Optional<Usuario> optionalUser = userRepo.findById(id);
+
+    if (optionalUser.isPresent()) {
+        Usuario user = optionalUser.get();
+
+        if (user.getPassword().equals(password)) {
+            userRepo.delete(user);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build(); // Incorrect password
+        }
+    } else {
+        return ResponseEntity.notFound().build();
+    }
+}	
 }
