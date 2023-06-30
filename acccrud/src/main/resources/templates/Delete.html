@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete User</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Delete User</h1>
+
+        <form id="deleteForm" method="delete" action="">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br><br>
+
+            <input type="submit" value="Delete">
+        </form>
+
+        <div id="errorMessage"></div>
+    </div>
+
+    <script>
+        window.onload = function () {
+            // Get the userId from the URL
+            const userId = window.location.href.split("/").pop();
+
+            // Set the form action dynamically
+            const form = document.getElementById("deleteForm");
+            form.action = "/user/" + userId;
+
+            // Handle form submission
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                // Get the form data
+                const password = document.getElementById("password").value;
+
+                // Create a URLSearchParams object and add the password parameter
+                const params = new URLSearchParams();
+                params.append('password', password);
+
+                // Send a DELETE request to delete the user with the password as a request parameter
+                fetch(form.action + '?' + params.toString(), {
+                    method: "DELETE"
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // User deleted successfully
+                        alert("User deleted successfully");
+                        window.location.href = "/"; // Redirect to home page
+                    } else {
+                        // Incorrect password
+                        alert("Incorrect password. Please try again.");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        };
+    </script>
+</body>
+</html>
