@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -22,6 +22,8 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.malpha.acccrud.Model.Usuario;
 import com.malpha.acccrud.Repo.UserRepository;
 
+import jakarta.annotation.PostConstruct;
+
 /* funcionalidades CRUD
  * create
  * read
@@ -34,103 +36,165 @@ import com.malpha.acccrud.Repo.UserRepository;
 public class UserController {
 
 	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@Autowired
 	private UserRepository userRepo;
 
 	public UserController(UserRepository userRepo) {
-    this.userRepo = userRepo;
-  }
-	
-	@GetMapping ("/admin")
-	public List<Usuario> list(){
-		return userRepo.findAll();		
+		this.userRepo = userRepo;
 	}
-	
+
+	@GetMapping("/admin")
+	public List<Usuario> list() {
+		return userRepo.findAll();
+	}
+
 	@PostMapping("/register")
 	public RedirectView addUser(@RequestParam("username") String username,
-						   @RequestParam("name") String name,
-                       	   @RequestParam("email") String email,
-                           @RequestParam("password") String password) {
+			@RequestParam("name") String name,
+			@RequestParam("email") String email,
+			@RequestParam("password") String password) {
 
-	boolean emailExists = userRepo.existsByEmail(email);
+		boolean emailExists = userRepo.existsByEmail(email);
+		boolean usernameExists = userRepo.existsByUsername(username);
 
-  if (emailExists) {
-    // Email already registered, return a popup message
-    String errorMessage = "Email already registered";
+		if (emailExists) {
+			// Email already registered, return a popup message
+			String errorMessage = "Email already registered";
 
-    // Pass the error message as a query parameter in the redirect URL
-    String redirectUrl = "http://localhost:8080/register?error=" + URLEncoder.encode(errorMessage, StandardCharsets.UTF_8);
+			// Pass the error message as a query parameter in the redirect URL
+			String redirectUrl = "http://localhost:8080/register?error="
+					+ URLEncoder.encode(errorMessage, StandardCharsets.UTF_8);
 
-    // Create a RedirectView with the redirect URL
-    RedirectView redirectView = new RedirectView();
-    redirectView.setUrl(redirectUrl);
+			// Create a RedirectView with the redirect URL
+			RedirectView redirectView = new RedirectView();
+			redirectView.setUrl(redirectUrl);
 
-    return redirectView;
-  }
-		
+			return redirectView;
+		} else if (usernameExists) {
+			// Username already in use, return a popup message
+			String errorMessage = "Username already in use";
+
+			// Pass the error message as a query parameter in the redirect URL
+			String redirectUrl = "http://localhost:8080/register?error="
+					+ URLEncoder.encode(errorMessage, StandardCharsets.UTF_8);
+
+			// Create a RedirectView with the redirect URL
+			RedirectView redirectView = new RedirectView();
+			redirectView.setUrl(redirectUrl);
+
+			return redirectView;
+		}
+
 		Usuario newUser = new Usuario();
-    	newUser.setUsername(username);
-    	newUser.setName(name);
-    	newUser.setEmail(email);
-    	newUser.setPassword(password);
+		newUser.setUsername(username);
+		newUser.setName(name);
+		newUser.setEmail(email);
+		newUser.setPassword(passwordEncoder.encode(password));
+		newUser.setRole("ROLE_USER");
 		userRepo.save(newUser);
 		long userId = newUser.getId();
 
-    	String redirectUrl = "http://localhost:8080/" + userId;
+		String redirectUrl = "http://localhost:8080/" + userId;
 
-    	RedirectView redirectView = new RedirectView();
-    	redirectView.setUrl(redirectUrl);
+		RedirectView redirectView = new RedirectView();
+		redirectView.setUrl(redirectUrl);
 
-    	return redirectView;
+		return redirectView;
 	}
 
 	@GetMapping("/{id}")
-  public Usuario getUserPage(@PathVariable("id") Long userId) {
-    // Retrieve user from the repository based on ID
-    Optional<Usuario> optionalUser = userRepo.findById(userId);
-	if (optionalUser.isEmpty()) {
-	        return null;
-	    }
-	Usuario existingUsuario = optionalUser.get();
-    
-    // Update the visit count
-    existingUsuario.setVisitCount(existingUsuario.getVisitCount() + 1);
-	userRepo.save(existingUsuario);
-	return existingUsuario;
-  }
-	
-	@PatchMapping("/{id}")
-	public ResponseEntity<Usuario> changeInfo(@PathVariable("id") Long userId,@RequestBody Usuario updatedUsuario) {
+	public Usuario getUserPage(@PathVariable("id") Long userId) {
+		// Retrieve user from the repository based on ID
 		Optional<Usuario> optionalUser = userRepo.findById(userId);
-	    if (optionalUser.isEmpty()) {
-	        return ResponseEntity.notFound().build();
-	    }
+		if (optionalUser.isEmpty()) {
+			return null;
+		}
+		Usuario existingUsuario = optionalUser.get();
 
-	    Usuario existingUsuario = optionalUser.get();
-	    
-	    existingUsuario.setUsername(updatedUsuario.getUsername());
-        existingUsuario.setPassword(updatedUsuario.getPassword());
-
-	    userRepo.save(existingUsuario);
-
-	    return ResponseEntity.ok(existingUsuario);	
+		// Update the visit count
+		existingUsuario.setVisitCount(existingUsuario.getVisitCount() + 1);
+		userRepo.save(existingUsuario);
+		return existingUsuario;
 	}
 
-	
+	@PatchMapping("/{id}")
+	public ResponseEntity<Usuario> changeInfo(@PathVariable("id") Long userId, @RequestBody Usuario updatedUsuario) {
+		Optional<Usuario> optionalUser = userRepo.findById(userId);
+		if (optionalUser.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+
+		Usuario existingUsuario = optionalUser.get();
+
+		existingUsuario.setUsername(updatedUsuario.getUsername());
+		existingUsuario.setPassword(updatedUsuario.getPassword());
+
+		userRepo.save(existingUsuario);
+
+		return ResponseEntity.ok(existingUsuario);
+	}
+
 	@DeleteMapping("/{id}")
-public ResponseEntity<Usuario> deleteUser(@PathVariable("id") Long id, @RequestParam("password") String password) {
-    Optional<Usuario> optionalUser = userRepo.findById(id);
+	public ResponseEntity<Usuario> deleteUser(@PathVariable("id") Long id, @RequestParam("password") String password) {
+		Optional<Usuario> optionalUser = userRepo.findById(id);
 
-    if (optionalUser.isPresent()) {
-        Usuario user = optionalUser.get();
+		if (optionalUser.isPresent()) {
+			Usuario user = optionalUser.get();
 
-        if (user.getPassword().equals(password)) {
-            userRepo.delete(user);
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.badRequest().build(); // Incorrect password
-        }
-    } else {
-        return ResponseEntity.notFound().build();
-    }
-}	
+			if (user.getPassword().equals(password)) {
+				userRepo.delete(user);
+				return ResponseEntity.ok().build();
+			} else {
+				return ResponseEntity.badRequest().build(); // Incorrect password
+			}
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+	@PostConstruct
+	public void createAdminUser() {
+		// Create an in-memory user with ADMIN role (for demo purposes)
+		Usuario adminUser = new Usuario();
+		adminUser.setName("admin");
+		adminUser.setEmail("adminUser@exemple.com");
+		adminUser.setPassword(passwordEncoder.encode("admin"));
+		adminUser.setUsername("admin");
+		adminUser.setRole("ROLE_ADMIN");
+
+		// Add the admin user to the repository
+		userRepo.save(adminUser);
+	}
+
+	@GetMapping("/success")
+	public RedirectView success(@RequestParam("Username") String username) {
+
+		// Retrieve the Usuario object from the repository using the username
+		Usuario usuario = userRepo.findByUsername(username);
+		if (usuario == null) {
+			// Handle the case where the user is not found in the repository
+			throw new IllegalStateException("User not found");
+		}
+
+		if (username.equals("admin")) {
+			String redirectUrl = "http://localhost:8080/" + "admin";
+
+			RedirectView redirectView = new RedirectView();
+			redirectView.setUrl(redirectUrl);
+
+			return redirectView;
+		} else {
+			// Retrieve the userId associated with the authenticated user
+			long userId = usuario.getId(); // Assuming userId is the username
+
+			String redirectUrl = "http://localhost:8080/" + userId;
+
+			RedirectView redirectView = new RedirectView();
+			redirectView.setUrl(redirectUrl);
+
+			return redirectView;
+		}
+	}
 }

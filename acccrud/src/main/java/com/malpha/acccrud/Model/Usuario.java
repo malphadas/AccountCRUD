@@ -21,12 +21,23 @@ public class Usuario {
 
     @Column(nullable = false)
     private String email;
-    
+
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
     private int visitCount = 0;
+
+    @Column(nullable = false)
+    private String role;
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     public long getId() {
         return id;
@@ -71,10 +82,9 @@ public class Usuario {
     public void setVisitCount(int visitCount) {
         this.visitCount = visitCount;
     }
-    
+
     public int getVisitCount() {
         return visitCount;
     }
 
-    
 }
