@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -168,33 +169,35 @@ public class UserController {
 		userRepo.save(adminUser);
 	}
 
-	@GetMapping("/success")
-	public RedirectView success(@RequestParam("Username") String username) {
+@GetMapping("/s")
+public RedirectView success(Authentication authentication) {
+	String redirectUrl;
 
-		// Retrieve the Usuario object from the repository using the username
-		Usuario usuario = userRepo.findByUsername(username);
-		if (usuario == null) {
-			// Handle the case where the user is not found in the repository
-			throw new IllegalStateException("User not found");
-		}
+    // Retrieve the Usuario object from the repository using the username
+    String username = authentication.getName();
 
-		if (username.equals("admin")) {
-			String redirectUrl = "http://localhost:8080/" + "admin";
+	Usuario usuario = userRepo.findByUsername(username);
+	
+    if (usuario == null) {
+        // Handle the case where the user is not found in the repository
+        throw new IllegalStateException("User not found");
+    }
 
-			RedirectView redirectView = new RedirectView();
-			redirectView.setUrl(redirectUrl);
+    if (username.equals("admin")) {
+        redirectUrl = "http://localhost:8080/admin";
 
-			return redirectView;
-		} else {
-			// Retrieve the userId associated with the authenticated user
-			long userId = usuario.getId(); // Assuming userId is the username
+    } else {
+        // Retrieve the userId associated with the authenticated user
+		Long userId = usuario.getId();
 
-			String redirectUrl = "http://localhost:8080/" + userId;
+        redirectUrl = "http://localhost:8080/" + userId;
+    }
 
-			RedirectView redirectView = new RedirectView();
-			redirectView.setUrl(redirectUrl);
+	RedirectView redirectView = new RedirectView();
+		redirectView.setUrl(redirectUrl);
 
-			return redirectView;
-		}
-	}
+		return redirectView;
+
+}
+
 }

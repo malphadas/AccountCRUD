@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,12 +45,19 @@ public class SecurityConfig {
                                         auth.requestMatchers("/admin").hasRole("ADMIN");
                                         auth.anyRequest().hasAnyRole("USER", "ADMIN");
                                 })
+                                .sessionManagement(session ->
+                                         session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                                         .sessionFixation().newSession())
                                 .formLogin(login ->
                                         login.loginPage("/login")
                                         .loginProcessingUrl("/login")
-                                        .defaultSuccessUrl("/success")
+                                        .defaultSuccessUrl("/user/s", true)
                                         .permitAll())
-                                .logout(logout -> logout.logoutSuccessUrl("/login"))
+                                .logout(logout -> logout.logoutUrl("/logout")
+                                        .logoutSuccessUrl("/")
+                                        .invalidateHttpSession(true)
+                                        .clearAuthentication(true)
+                                        .deleteCookies("JSESSIONID"))
                                 .csrf(csrf -> csrf.disable())
                                 .httpBasic(withDefaults())
                                 .build();
