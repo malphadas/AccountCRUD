@@ -39,9 +39,8 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 return http
-                                .csrf(csrf -> csrf.disable())
                                 .authorizeHttpRequests(auth -> {
-                                        auth.requestMatchers("/", "/login", "/register", "/user/**").permitAll();
+                                        auth.requestMatchers("/", "/login", "/register", "/user/**","/swagger-ui/**", "/api-docs/**").permitAll();
                                         auth.requestMatchers("/admin").hasRole("ADMIN");
                                         auth.anyRequest().hasAnyRole("USER", "ADMIN");
                                 })
@@ -53,7 +52,8 @@ public class SecurityConfig {
                                         .loginProcessingUrl("/login")
                                         .defaultSuccessUrl("/user/s", true)
                                         .permitAll())
-                                .logout(logout -> logout.logoutUrl("/logout")
+                                .logout(logout ->
+                                          logout.logoutUrl("/logout")
                                         .logoutSuccessUrl("/")
                                         .invalidateHttpSession(true)
                                         .clearAuthentication(true)

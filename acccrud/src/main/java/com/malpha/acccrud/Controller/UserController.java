@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -144,7 +145,8 @@ public class UserController {
 		if (optionalUser.isPresent()) {
 			Usuario user = optionalUser.get();
 
-			if (user.getPassword().equals(password)) {
+			BCryptPasswordEncoder passEncoder = new BCryptPasswordEncoder();
+			if (passEncoder.matches(user.getPassword(), password)) {
 				userRepo.delete(user);
 				return ResponseEntity.ok().build();
 			} else {
