@@ -42,7 +42,7 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(auth -> {
                                         auth.requestMatchers("/", "/login", "/register", "/user/**","/swagger-ui/**", "/api-docs/**").permitAll();
                                         auth.requestMatchers("/admin").hasRole("ADMIN");
-                                        auth.anyRequest().hasAnyRole("USER", "ADMIN");
+                                        auth.anyRequest().permitAll();
                                 })
                                 .sessionManagement(session ->
                                          session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
@@ -58,6 +58,8 @@ public class SecurityConfig {
                                         .invalidateHttpSession(true)
                                         .clearAuthentication(true)
                                         .deleteCookies("JSESSIONID"))
+                               /*  .passwordManagement((management) ->
+                                        management.changePasswordPage("/edit/**"))*/
                                 .csrf(csrf -> csrf.disable())
                                 .httpBasic(withDefaults())
                                 .build();

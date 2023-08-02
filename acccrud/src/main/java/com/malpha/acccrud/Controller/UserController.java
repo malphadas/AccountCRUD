@@ -8,7 +8,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -131,7 +130,7 @@ public class UserController {
 		Usuario existingUsuario = optionalUser.get();
 
 		existingUsuario.setUsername(updatedUsuario.getUsername());
-		existingUsuario.setPassword(updatedUsuario.getPassword());
+		existingUsuario.setPassword(passwordEncoder.encode(updatedUsuario.getPassword()));
 
 		userRepo.save(existingUsuario);
 
@@ -145,8 +144,14 @@ public class UserController {
 		if (optionalUser.isPresent()) {
 			Usuario user = optionalUser.get();
 
-			BCryptPasswordEncoder passEncoder = new BCryptPasswordEncoder();
-			if (passEncoder.matches(user.getPassword(), password)) {
+			// Retrieve the encrypted password from the user object
+			String storedEncryptedPassword = user.getPassword();
+
+			// Check if the inputted password matches the stored encrypted password
+			boolean passwordMatches = passwordEncoder.matches(password, storedEncryptedPassword);
+	
+			if (passwordMatches) {
+				// Delete the user account
 				userRepo.delete(user);
 				return ResponseEntity.ok().build();
 			} else {
